@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data User</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+  <button id="tambahBtn">Tambah User</button>
+
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nama</th>
+        <th>Username</th>
+        <th>Telepon</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="formContainer" style="display: none;">
+    <h3>Tambah User</h3>
+    <form id="userForm">
+      <input type="hidden" id="userId" name="id">
+      <label for="nama">Nama:</label>
+      <input type="text" id="nama" name="nama" required>
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="telepon">Telepon:</label>
+      <input type="text" id="telepon" name="telepon" required>
+      <label for="email">Email:</label>
+      <input type="text" id="email" name="email" required>
+      <button type="submit">Simpan</button>
+      <button type="button" id="cancelBtn">Batal</button>
+    </form>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+    $(document).ready(function() {
+      var dataTable = $('#userTable').DataTable({
+        columns: [
+          { data: 'id' },
+          { data: 'nama_user' },
+          { data: 'username' },
+          { data: 'telepon' },
+          { data: 'email' },
+          {
+            data: null,
+            render: function(data, type, row) {
+              return '<button class="editBtn" data-id="' + data.id + '">Edit</button>' +
+                     '<button class="deleteBtn" data-id="' + data.id + '">Hapus</button>';
+            }
+          }
+        ]
+      });
+
+      function loadUserData() {
+        $.ajax({
+          url: 'http://localhost:3000/users',
+          method: 'GET',
+          dataType: 'json',
+          success: function(response) {
+            dataTable.clear().rows.add(response).draw();
+          }
+        });
+      }
+
+      loadUserData();
+
+      $('#tambahBtn').button().click(function() {
+        $('#userForm')[0].reset();
+        $('#userId').val('');
+        $('#formContainer').show();
+      });
+
+      $('#userForm').submit(function(e) {
+        e.preventDefault();
+        var userId = $('#userId').val();
+        var userData = {
+          nama_user: $('#nama').val(),
+          username: $('#username').val(),
+          telepon: $('#telepon').val(),
+          email: $('#email').val()
+        };
+
+        var apiUrl = userId ? 'http://localhost:3000/users/' + userId : 'http://localhost:3000/users';
+
+        $.ajax({
+          url: apiUrl,
+          method: userId ? 'PUT' : 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          data: JSON.stringify(userData),
+          success: function(response) {
+            if (userId) {
+              var index = dataTable.row($('button.editBtn[data-id="' + userId + '"]').parents('tr')).index();
+              dataTable.row(index).data(response).draw();
+            } else {
+              dataTable.row.add(response).draw();
+            }
+            $('#formContainer').hide();
+          }
+        });
+      });
+
+      $(document).on('click', '.editBtn', function() {
+        var userId = $(this).data('id');
+        var apiUrl = 'http://localhost:3000/users/' + userId;
+
+        $.ajax({
+          url: apiUrl,
+          method: 'GET',
+          dataType: 'json',
+          success: function(response) {
+            $('#userId').val(response.id);
+            $('#nama').val(response.nama_user);
+            $('#username').val(response.username);
+            $('#telepon').val(response.telepon);
+            $('#email').val(response.email);
+            $('#formContainer').show();
+          }
+        });
+      });
+
+      $(document).on('click', '.deleteBtn', function() {
+        var userId = $(this).data('id');
+        var apiUrl = 'http://localhost:3000/users/' + userId;
+
+        if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
+          $.ajax({
+            url: apiUrl,
+            method: 'DELETE',
+            success: function(response) {
+              var index = dataTable.row($('button.deleteBtn[data-id="' + userId + '"]').parents('tr')).index();
+              dataTable.row(index).remove().draw();
+            }
+          });
+        }
+      });
+
+      $('#cancelBtn').button().click(function() {
+        $('#userForm')[0].reset();
+        $('#userId').val('');
+        $('#formContainer').hide();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "nama_user": "ganesa",
+      "username": "rachelimanuella@student.telkomuniversity.ac.id",
+      "telepon": "100000",
+      "email": "da",
+      "id": 5
+    },
+    {
+      "nama_user": "ganesa",
+      "username": "vinsmoke sanji",
+      "telepon": "50000",
+      "email": "irbahaha@student.telkomuniversity.ac.id",
+      "id": 6
+    },
+    {
+      "nama_user": "jjksj",
+      "username": "xsxsx",
+      "telepon": "xxxxxxxxxxx",
+      "email": "hai",
+      "id": 7
+    },
+    {
+      "nama_user": "qanit",
+      "username": "fss",
+      "telepon": "50000",
+      "email": "irbahaha@student.telkomuniversity.ac.id",
+      "id": 8
+    },
+    {
+      "nama_user": "dsadsf",
+      "username": "rachelimanuella",
+      "telepon": "291928",
+      "email": "rachelimanuella@student.telkomuniversity.ac.id",
+      "id": 9
+    }
+  ]
+}
